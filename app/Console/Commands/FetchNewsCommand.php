@@ -2,23 +2,19 @@
 
 namespace App\Console\Commands;
 
+use App\Models\NewsArticle; 
 use Illuminate\Console\Command;
-use App\Services\DataFetching\Providers\NewsApiProvider; 
+use App\Services\DataFetching\Providers\NewsApiProvider;
 
 class FetchNewsCommand extends Command
 {
-
     protected $signature = 'app:fetch-news';
 
-
-    protected $description = 'Fetches news from the NewsAPI provider and displays them';
-
+    protected $description = 'Fetches news from the NewsAPI provider and saves it to the database';
 
     public function handle(NewsApiProvider $newsApiProvider)
     {
         $this->info('Fetching news from NewsAPI...');
-
-        // Вызываем метод из нашего провайдера
         $articles = $newsApiProvider->fetchData();
 
         if (empty($articles)) {
@@ -26,19 +22,30 @@ class FetchNewsCommand extends Command
             return;
         }
 
-        $this->info('Successfully fetched ' . count($articles) . ' articles.');
+        $this->info('Saving ' . count($articles) . ' articles to the database...');
 
-        // Готовим данные для вывода в виде таблицы
-        $displayData = [];
+        //  ПРОГРЕСС-БАР 
+        $bar = $this->output->createProgressBar(count($articles));
+        $bar->start();
+
+        
         foreach ($articles as $article) {
-            $displayData[] = [
-                'Source' => $article['source']['name'] ?? 'N/A',
-                'Title' => $article['title'] ?? 'N/A',
-                'URL' => $article['url'] ?? 'N/A',
-            ];
+            
+            NewsArticle::updateOrCreate(
+                [
+                    'url' => $article['url'], // Искать запись по уникальному полю URL
+                ],
+                [
+                    'source' => $article['source']['name'] ?? 'N/A',
+                    'title' => $article['title'] ?? 'N/A',
+                    'description' => $article['description'] ?? '',
+                    'published_at' => isset($article['publishedAt']) ? new \DateTime($article['publishedAt']) : null,
+                ]
+            );
+            $bar->advance(); 
         }
 
-        // Выводим данные в терминал
-        $this->table(['Source', 'Title', 'URL'], $displayData);
+        $bar->finish();
+        $this->info("\nSuccessfully saved/updated articles.");
     }
 }
