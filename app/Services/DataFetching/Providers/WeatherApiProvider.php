@@ -1,5 +1,5 @@
 <?php
-
+ //app/Services/DataFetching/Providers/WeatherApiProvider.php
 namespace App\Services\DataFetching\Providers;
 
 use App\Services\DataFetching\Contracts\DataProviderInterface;
@@ -28,4 +28,5 @@ class WeatherApiProvider implements DataProviderInterface
 
         return [ $response->json() ];
     }
+   
 }

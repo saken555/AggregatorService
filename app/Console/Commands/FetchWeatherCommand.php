@@ -42,4 +42,5 @@ class FetchWeatherCommand extends Command
             $this->error('Failed to save weather data: ' . $e->getMessage());
         }
     }
+    //
 }
