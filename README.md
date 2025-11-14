@@ -1,4 +1,5 @@
-## English version | Русская версия
+## [Русская версия](README_RU.md)
+
 
 Aggregator Service
 
