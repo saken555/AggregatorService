@@ -1,4 +1,4 @@
-## English version | Русская версия
+## [English version](README.md)
 
 Aggregator Service (Сервис-Агрегатор)
 
